@@ -8,9 +8,9 @@ To use it, follow these simple steps:
     npm install yui3-gallery
     npm install yui3-2in3
 
-    git clone git://github.com/caridy/yui3-gallery-build.git
+    git clone git://github.com/caridy/yui3-gallery-dashboard.git
 
-    cd yui3-gallery-build
+    cd yui3-gallery-dashboard
 
 For a normal run:
     ./server.js
@@ -19,9 +19,17 @@ Visit: http://localhost:8001/
 
 To use Spark: http://github.com/senchalabs/spark
 
+Spark Config (config.js):
+
+module.exports = {
+    port: 8001,
+    env: 'production',
+    workers: 10
+}
+
 Install spark via:
 
     npm install spark
     spark
 
-Visit: http://localhost:3200/
+Visit: http://localhost:8001/
