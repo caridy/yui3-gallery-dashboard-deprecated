@@ -1,0 +1,79 @@
+<h1>Module: {title}</h1>
+
+<div class="module-badge">
+    <ul>
+        <li>module: <a href="{url}">{module}</a></li>
+        <li>summary: {summary}</li>
+        <li>requires: {requires}</li>
+        <li>supersedes: {supersedes}</li>
+        <li>optional: {optional}</li>
+        <li>license: <a href="{license_url}">{license}</a></li>
+        <li>buildtag: <a href="http://yuilibrary.com/gallery/buildtag/{module}/{buildtag}">{buildtag}</a></li>
+    </ul>
+</div>
+
+<div class="module-tabview" id="{module}"></div>
+
+<p><a href="/modules/">[Back to module list]</a></p>
+
+<script type="text/javascript">
+YUI().use("yui", "tabview", "gallery-widget-io", function(Y) {
+
+    var node = Y.one('.module-tabview'),
+        tabs = {
+            "API Doc": '/api/',
+            "Unit Tests": '/yeti/',
+            "Code Quality": '/jslint/'
+        },
+        TabIO = function(config) {
+            TabIO.superclass.constructor.apply(this, arguments); 
+        };
+
+    Y.extend(TabIO, Y.Plugin.WidgetIO, {
+        initializer: function() {
+            var tab = this.get('host');
+            tab.on('selectedChange', this.afterSelectedChange);
+        },
+
+        afterSelectedChange: function(e) { // this === tab
+            if (e.newVal) { // tab has been selected
+                this.io.refresh();
+            }
+        },
+
+        setContent: function(content) {
+            var tab = this.get('host');
+            tab.set('content', content);
+        },
+
+        _toggleLoadingClass: function(add) {
+            this.get('host').get('panelNode')
+                .toggleClass(this.get('host').getClassName('loading'), add);
+        }
+
+    }, {
+        NAME: 'tabIO',
+        NS: 'io'
+    });
+
+    var tabview = new Y.TabView({
+        children: []
+    });
+
+    Y.each(tabs, function(src, label, indx) {
+        tabview.add({
+            label: label,
+            plugins: [{
+                fn: TabIO, 
+                cfg: {
+                    uri: src+node.get('id')
+                }
+            }]
+        }, indx);
+    });
+    tabview.selectChild(0);
+
+    tabview.render(node);
+
+});
+</script>
