@@ -1,0 +1,27 @@
+This is the source code for: http://gallery.caridy.name/
+
+You must have git, NodeJS 0.2.1 and npm 0.2.0 installed
+
+To use it, follow these simple steps:
+
+    npm install yui3
+    npm install yui3-gallery
+    npm install yui3-2in3
+
+    git clone git://github.com/caridy/yui3-gallery-build.git
+
+    cd yui3-gallery-build
+
+For a normal run:
+    ./server.js
+
+Visit: http://localhost:8001/
+
+To use Spark: http://github.com/senchalabs/spark
+
+Install spark via:
+
+    npm install spark
+    spark
+
+Visit: http://localhost:3200/
