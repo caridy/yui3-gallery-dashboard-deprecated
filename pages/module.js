@@ -20,7 +20,7 @@ exports.ls = function(path, cb) {
 
 function _docReady (path, module, build, cb) {
 
-    var repo    = '/Users/caridy/Bubbling', // '/var/node',
+    var repo    = (path.indexOf('/var/node')===0 ? '/var/node' : '/Users/caridy/Bubbling'),
         yuidoc  = repo+'/yuidoc',
 
         src         = repo+'/yui3-gallery/src/gallery-'+module+'/js',
