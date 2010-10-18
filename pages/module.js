@@ -2,21 +2,17 @@ var YUI = require('yui3').YUI,
     fs = require('fs'),
     exec = require('child_process').exec;
 
-/*
-exports.ls = function(path, cb) {
+function _yetiReady (path, module, build, cb) {
+    cb(false);
+}
 
-    exec("ls", function puts(error, stdout, stderr) { 
-        if (error !== null) {
-            console.log('exec error: ' + error);
-            // parse the stdout string
-            cb.call(stdout.split (' '));
-        } else {
-            cb.call([]);
-        }
-    });
+function _jslintReady (path, module, build, cb) {
+    cb(false);
+}
 
-};
-*/
+function _getSource (path, module, build, cb) {
+    cb(false);
+}
 
 function _docReady (path, module, build, cb) {
 
@@ -55,72 +51,120 @@ function _docReady (path, module, build, cb) {
 
 };
 
-exports.render = function(req, res, config) {
-    var sql = "select * from yui.gallery.module where module='"+config.module+"'";
-
+function _getModuleInfo (config, cb) {
     YUI({ debug: !!config.debug }).use('yql', 'node', function(page) {
-        var title = 'Gallery Module - '+config.module;
-        page.YQL(sql, function(r) {
-
-            var module = r.query.results.json;
-            page.one('body').addClass('yui3-skin-sam')
-            
-            res.render(config.page, {
-                locals: {
-                    instance: page,
-                    content: '#content',
-                    sub: module,
-                    after: function(Y) {
-                        Y.one('title').set('innerHTML', title);
-                        Y.all('#nav li').removeClass('selected');
-                        Y.one('#nav li.modules').addClass('selected');
-                    }
-                }
-            });
-        }, { env: 'http:/'+'/yuilibrary.com/yql/yui.env' });
-
+        page.YQL("select * from yui.gallery.module where module='"+config.module+"'", function(r) {
+            cb(page, r);
+        }, {
+            env: 'http:/'+'/yuilibrary.com/yql/yui.env' 
+        });
     });
-};
+}
 
-exports.partial = function(req, res, config) {
-    var sql = "select * from yui.gallery.module where module='"+config.module+"'";
+exports.render = function(req, res, config) {
+    _getModuleInfo(config, function(page, r) {
 
-    YUI({ debug: !!config.debug }).use('yql', 'node', function(page) {
-        var title = 'Gallery Module - '+config.module;
-        page.YQL(sql, function(r) {
+        var title = 'Gallery Module - '+config.module,
+            module = r.query.results.json;
 
-            var module = r.query.results.json;
-            var content = page.Lang.sub(res.partial(config.partial), module);
-            res.send(content, {});
-
-        }, { env: 'http:/'+'/yuilibrary.com/yql/yui.env' });
+        page.one('body').addClass('yui3-skin-sam')
+        
+        res.render(config.page, {
+            locals: {
+                instance: page,
+                content: '#content',
+                sub: module,
+                after: function(Y) {
+                    Y.one('title').set('innerHTML', title);
+                    Y.all('#nav li').removeClass('selected');
+                    Y.one('#nav li.modules').addClass('selected');
+                }
+            }
+        });
 
     });
 };
 
 exports.api = function(req, res, config) {
-    var sql = "select * from yui.gallery.module where module='"+config.module+"'";
 
-    YUI({ debug: !!config.debug }).use('yql', 'node', function(page) {
-        var title = 'Gallery Module - '+config.module;
-        page.YQL(sql, function(r) {
+    _getModuleInfo(config, function(page, r) {
+        var module = r.query.results.json;
+        var content = page.Lang.sub(res.partial(config.partial), module);
 
-            var module = r.query.results.json;
-            var content = page.Lang.sub(res.partial(config.partial), module);
-            
-            _docReady (config.path, config.module, module.buildtag, function(r) {
-                var iframe = '';
-                if (r) {
-                    // api is available
-                    iframe = '<iframe src="/api/'+config.module+'/index.html" class="api-iframe"><iframe>';
-                } else {
-                    // api is not available
-                    iframe = '<p class="red">API is not available for this module</p>';
-                }
-                res.send(content+iframe, {});
-            });
-
-        }, { env: 'http:/'+'/yuilibrary.com/yql/yui.env' });
-
+        _docReady (config.path, config.module, module.buildtag, function(r) {
+            var iframe = '';
+            if (r) {
+                // api is available
+                iframe = '<iframe src="/api/'+config.module+'/index.html" class="api-iframe"><iframe>';
+            } else {
+                // api is not available
+                iframe = '<p class="red">API is not available for this module</p>';
+            }
+            res.send(content+iframe, {});
+        });
     });
+
+};
+
+exports.yeti = function(req, res, config) {
+
+    _getModuleInfo(config, function(page, r) {
+        var module = r.query.results.json;
+        var content = page.Lang.sub(res.partial(config.partial), module);
+
+        _yetiReady (config.path, config.module, module.buildtag, function(r) {
+            var iframe = '';
+            if (r) {
+                // api is available
+                iframe = '<iframe src="/yeti/'+config.module+'/index.html" class="api-iframe"><iframe>';
+            } else {
+                // api is not available
+                iframe = '<p class="red">YETI results are not available for this module</p>';
+            }
+            res.send(content+iframe, {});
+        });
+    });
+
+};
+
+exports.jslint = function(req, res, config) {
+
+    _getModuleInfo(config, function(page, r) {
+        var module = r.query.results.json;
+        var content = page.Lang.sub(res.partial(config.partial), module);
+
+        _jslintReady (config.path, config.module, module.buildtag, function(r) {
+            var iframe = '';
+            if (r) {
+                // api is available
+                iframe = '<iframe src="/jslint/'+config.module+'/index.html" class="api-iframe"><iframe>';
+            } else {
+                // api is not available
+                iframe = '<p class="red">JSLint report is not available for this module</p>';
+            }
+            res.send(content+iframe, {});
+        });
+    });
+
+};
+
+exports.source = function(req, res, config) {
+
+    _getModuleInfo(config, function(page, r) {
+        var module = r.query.results.json;
+        var content = page.Lang.sub(res.partial(config.partial), module);
+
+        _getSource (config.path, config.module, module.buildtag, function(r) {
+            var iframe = '';
+            if (r) {
+                // api is available
+                iframe = '<iframe src="/jslint/'+config.module+'/index.html" class="api-iframe"><iframe>';
+            } else {
+                // api is not available
+                iframe = '<p class="red">Source Code is not available for this module</p>';
+            }
+            res.send(content+iframe, {});
+        });
+    });
+
 };

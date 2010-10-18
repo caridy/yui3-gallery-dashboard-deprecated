@@ -1,9 +1,11 @@
 <h1>Module: {title}</h1>
-
+<p>
+    {summary}<br>
+    <a href="http://yuilibrary.com/gallery/show/{module}">http://yuilibrary.com/gallery/show/{module}</a>
+</p>
 <div class="module-badge">
     <ul>
-        <li>module: <a href="{url}">{module}</a></li>
-        <li>summary: {summary}</li>
+        <li>module: {module}</li>
         <li>requires: {requires}</li>
         <li>supersedes: {supersedes}</li>
         <li>optional: {optional}</li>
@@ -23,6 +25,7 @@ YUI().use("yui", "tabview", "gallery-widget-io", function(Y) {
         tabs = {
             "API Doc": '/apidoc/',
             "Unit Tests": '/yeti/',
+            "Source Code": '/source/',
             "Code Quality": '/jslint/'
         },
         TabIO = function(config) {

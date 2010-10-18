@@ -141,7 +141,7 @@ YUI({ debug: false }).use('express', 'node', function(Y) {
     });
 
     app.get('/yeti/:id?', function(req, res) {
-        require('./pages/module.js').partial(req, res, {
+        require('./pages/module.js').yeti(req, res, {
             debug: DEBUG,
             module: req.params.id,
             path: PATH,
@@ -150,11 +150,20 @@ YUI({ debug: false }).use('express', 'node', function(Y) {
     });
 
     app.get('/jslint/:id?', function(req, res) {
-        require('./pages/module.js').partial(req, res, {
+        require('./pages/module.js').jslint(req, res, {
             debug: DEBUG,
             module: req.params.id,
             path: PATH,
             partial: 'module_jslint.html'
+        });
+    });
+
+    app.get('/source/:id?', function(req, res) {
+        require('./pages/module.js').source(req, res, {
+            debug: DEBUG,
+            module: req.params.id,
+            path: PATH,
+            partial: 'module_source.html'
         });
     });
 
