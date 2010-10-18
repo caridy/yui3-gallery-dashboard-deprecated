@@ -26,12 +26,12 @@ function _docReady (path, module, build, cb) {
         src         = repo+'/yui3-gallery/src/gallery-'+module+'/js',
         parser      = yuidoc+'/parser/gallery-'+module,
         template    = yuidoc+'/template',
-        api         = path+'/doc/'+module,
+        api         = path+'/static/doc/'+module,
 
         // final command
-        generate = 'mkdir -p '+api+'; '+yuidoc+'/bin/yuidoc.py "'+src+'" -p "'+parser+'" -o "'+api+'" -t "'+template+'" -v "'+module+'" -Y 3';
+        generate = 'mkdir -p '+api+'; '+yuidoc+'/bin/yuidoc.py "'+src+'" -p "'+parser+'" -o "'+api+'" -t "'+template+'" -v "'+build+'" -Y 3';
 
-    // sudo /var/node/yuidoc/bin/yuidoc.py "/var/node/yui3-gallery/src/gallery-dispatcher/js" -p "/var/node/yui3-gallery/parser/gallery-dispatcher" -o "/var/node/yui3-gallery/api/gallery-dispatcher" -t "/var/node/yui^Cc/template" -v "gallery-2010.09.15-18-40" -Y 3
+    // sudo /var/node/yuidoc/bin/yuidoc.py "/var/node/yui3-gallery/src/gallery-dispatcher/js" -p "/var/node/yui3-gallery/parser/gallery-dispatcher" -o "/var/node/yui3-gallery/api/gallery-dispatcher" -t "/var/node/yuidoc/template" -v "gallery-2010.09.15-18-40" -Y 3
 
     // checking if the module api folder exists
     fs.stat(api, function (err, stat) {
