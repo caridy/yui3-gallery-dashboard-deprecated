@@ -26,7 +26,7 @@ function _docReady (path, module, build, cb) {
         src         = repo+'/yui3-gallery/src/gallery-'+module+'/js',
         parser      = yuidoc+'/parser/gallery-'+module,
         template    = yuidoc+'/template',
-        api         = path+'/static/doc/'+module,
+        api         = path+'/static/api/'+module,
 
         // final command
         generate = 'mkdir -p '+api+'; '+yuidoc+'/bin/yuidoc.py "'+src+'" -p "'+parser+'" -o "'+api+'" -t "'+template+'" -v "'+build+'" -Y 3';
@@ -112,7 +112,7 @@ exports.api = function(req, res, config) {
                 var iframe = '';
                 if (r) {
                     // api is available
-                    iframe = '<iframe src="/doc/'+config.module+'/index.html" class="api"><iframe>';
+                    iframe = '<iframe src="/api/'+config.module+'/index.html" class="api"><iframe>';
                 } else {
                     // api is not available
                     iframe = '<p class="red">API is not available for this module</p>';

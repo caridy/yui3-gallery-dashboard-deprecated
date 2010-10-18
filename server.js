@@ -131,7 +131,7 @@ YUI({ debug: false }).use('express', 'node', function(Y) {
         });
     });
 
-    app.get('/api/:id?', function(req, res) {
+    app.get('/apidoc/:id?', function(req, res) {
         require('./pages/module.js').api(req, res, {
             debug: DEBUG,
             module: req.params.id,
