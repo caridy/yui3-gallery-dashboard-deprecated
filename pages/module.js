@@ -38,16 +38,16 @@ function _docReady (path, module, build, cb) {
         if (!err && stat.isDirectory()) {
             // doc is ready to be used
             console.log ('The API for module '+module+' was already generated.');
-            cb.call(true);
+            cb(true);
         } else {
             console.log ('Generating API for module '+module+': '+ generate);
             exec(generate, function (error, stdout, stderr) { 
                 if (error !== null) {
                     console.log('Error trying to generate API for module ' + module + ': ' + error);
                     // parse the stdout string
-                    cb.call(true);
+                    cb(false);
                 } else {
-                    cb.call(false);
+                    cb(true);
                 }
             });
         }
@@ -108,11 +108,11 @@ exports.api = function(req, res, config) {
             var module = r.query.results.json;
             var content = page.Lang.sub(res.partial(config.partial), module);
             
-            _docReady (config.path, config.module, module.buildtag, function(ready) {
+            _docReady (config.path, config.module, module.buildtag, function(r) {
                 var iframe = '';
-                if (ready) {
+                if (r) {
                     // api is available
-                    iframe = '<iframe src="/doc/'+config.module+'" class="api"><iframe>';
+                    iframe = '<iframe src="/doc/'+config.module+'/index.html" class="api"><iframe>';
                 } else {
                     // api is not available
                     iframe = '<p class="red">API is not available for this module</p>';
