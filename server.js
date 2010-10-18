@@ -5,12 +5,11 @@
 process.chdir(__dirname);
 
 var express = require('express'),
-    path = require('path'),
-    fs = require('fs'),
     YUI = require('yui3').YUI,
+    PATH = __dirname,
     DEBUG = true;
 
-   
+console.log ('caridy: '+PATH);   
 //Create the express application and allow the use of Spark (http://github.com/senchalabs/spark)
 var app = module.exports = express.createServer();
 /**
@@ -29,7 +28,7 @@ YUI({ debug: false }).use('express', 'node', function(Y) {
         app.use(express.conditionalGet());
         app.use(express.cache());
         app.use(express.gzip());        
-        app.use(express.staticProvider(__dirname + '/assets'));
+        app.use(express.staticProvider(PATH + '/static'));
     });
     
     //Set the development environment to debug, so YUI modues echo log statements
@@ -133,9 +132,10 @@ YUI({ debug: false }).use('express', 'node', function(Y) {
     });
 
     app.get('/api/:id?', function(req, res) {
-        require('./pages/module.js').partial(req, res, {
+        require('./pages/module.js').api(req, res, {
             debug: DEBUG,
             module: req.params.id,
+            path: PATH,
             partial: 'module_api.html'
         });
     });
@@ -144,6 +144,7 @@ YUI({ debug: false }).use('express', 'node', function(Y) {
         require('./pages/module.js').partial(req, res, {
             debug: DEBUG,
             module: req.params.id,
+            path: PATH,
             partial: 'module_yeti.html'
         });
     });
@@ -152,6 +153,7 @@ YUI({ debug: false }).use('express', 'node', function(Y) {
         require('./pages/module.js').partial(req, res, {
             debug: DEBUG,
             module: req.params.id,
+            path: PATH,
             partial: 'module_jslint.html'
         });
     });
