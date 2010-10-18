@@ -112,7 +112,7 @@ exports.api = function(req, res, config) {
                 var iframe = '';
                 if (r) {
                     // api is available
-                    iframe = '<iframe src="/api/'+config.module+'/index.html" class="api"><iframe>';
+                    iframe = '<iframe src="/api/'+config.module+'/index.html" class="api-iframe"><iframe>';
                 } else {
                     // api is not available
                     iframe = '<p class="red">API is not available for this module</p>';
