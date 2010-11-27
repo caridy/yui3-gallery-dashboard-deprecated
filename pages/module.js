@@ -7,11 +7,83 @@ function _yetiReady (path, module, build, cb) {
 }
 
 function _jslintReady (path, module, build, cb) {
-    cb(false);
+
+    var repo    = (path.indexOf('/var/node')===0 ? '/var/node' : '/Users/caridy/Bubbling'),
+        file    = repo+'/yui3-gallery/build/gallery-'+module+'/gallery-'+module+'.js',
+        report  = path+'/static/jslint/'+module+'-'+build+'.txt',
+
+        // final command
+        jslint = 'jslint '+file+' | cat > '+report;
+
+    // checking if the module api folder exists
+    fs.stat(report, function (err, stat) {
+        if (!err && stat.isDirectory()) {
+            // doc is ready to be used
+            console.log ('The JSLint report for module '+module+' was already generated.');
+            cb(true);
+        } else {
+            console.log ('Generating JSLint report for module '+module+': '+ jslint);
+            exec(jslint, function (err, stdout, stderr) { 
+                if (err !== null) {
+                    console.log('Error trying to generate JSLint report for module ' + module + ': ' + err);
+                    // parse the stdout string
+                    cb(false);
+                } else {
+                    cb(true);
+                }
+            });
+        }
+    });
 }
 
 function _getSource (path, module, build, cb) {
-    cb(false);
+    var repo    = (path.indexOf('/var/node')===0 ? '/var/node' : '/Users/caridy/Bubbling'),
+        file    = repo+'/yui3-gallery/build/gallery-'+module+'/gallery-'+module+'.js',
+        html    = path+'/static/source/'+module+'-'+build+'.html';
+
+    // checking if the module api folder exists
+    fs.stat(html, function (err, stat) {
+        if (!err && stat.isDirectory()) {
+            // doc is ready to be used
+            console.log ('The source code for module '+module+' was already highlighted.');
+            cb(true);
+        } else {            
+            fs.stat(file, function (err, stat) {
+                if (err !== null) {
+                    console.log('Error trying to locate the source code for module ' + module + ': ' + file + ' - Error: ' + err);
+                    // parse the stdout string
+                    cb(false);
+                } else {
+                    fs.readFile(file, function (err, content) {
+                        var highlighter = require("highlight").Highlight,
+                            result = content;
+                        if (err !== null) {
+                            // parse the stdout string
+                            cb(false);
+                        } else {
+                            // highlighting the content of the source
+                            try {
+                                result = highlighter(content+' ');
+                            } catch (e) {
+                                console.log('Error trying to hightlight the source code for module ' + module + ': ' + e);
+                                result = content;
+                            }
+                            result = '<!DOCTYPE html><html><head><title>hightlighted source code for module ' + module + '</title><link rel="stylesheet" href="/assets/github.css" type="text/css"></head><body><pre>'+result+'</pre></body></html>';
+                            // writting highlighted content to a file to avoid overhead (one time generation)
+                            fs.writeFile(html, result, function (err1) {
+                                if (err1) {
+                                    console.log('Error trying to write the hightlighted source code for module ' + module + ': ' + err);
+                                    cb(false);
+                                } else {
+                                    cb(true);
+                                }
+                            });
+                        }
+                    })
+                }
+            })
+        }
+    });
 }
 
 function _docReady (path, module, build, cb) {
@@ -37,9 +109,9 @@ function _docReady (path, module, build, cb) {
             cb(true);
         } else {
             console.log ('Generating API for module '+module+': '+ generate);
-            exec(generate, function (error, stdout, stderr) { 
-                if (error !== null) {
-                    console.log('Error trying to generate API for module ' + module + ': ' + error);
+            exec(generate, function (err, stdout, stderr) { 
+                if (err !== null) {
+                    console.log('Error trying to generate API for module ' + module + ': ' + err);
                     // parse the stdout string
                     cb(false);
                 } else {
@@ -137,7 +209,7 @@ exports.jslint = function(req, res, config) {
             var iframe = '';
             if (r) {
                 // api is available
-                iframe = '<iframe src="/jslint/'+config.module+'/index.html" class="api-iframe"><iframe>';
+                iframe = '<iframe src="/jslint/'+config.module+'-'+module.buildtag+'.txt" class="api-iframe"><iframe>';
             } else {
                 // api is not available
                 iframe = '<p class="red">JSLint report is not available for this module</p>';
@@ -158,7 +230,7 @@ exports.source = function(req, res, config) {
             var iframe = '';
             if (r) {
                 // api is available
-                iframe = '<iframe src="/jslint/'+config.module+'/index.html" class="api-iframe"><iframe>';
+                iframe = '<iframe src="/source/'+config.module+'-'+module.buildtag+'.html" class="api-iframe"><iframe>';
             } else {
                 // api is not available
                 iframe = '<p class="red">Source Code is not available for this module</p>';
